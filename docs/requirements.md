@@ -1,0 +1,1 @@
+sudo apt install build-essential git make nasm grub-pc-bin grub-common xorriso qemu-system-x86
