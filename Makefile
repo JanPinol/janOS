@@ -8,148 +8,137 @@
 # Tools
 # ------------------------------------------------------------
 
-# C compiler used to compile both C files and .S assembly files
-CC := gcc
-
-# Linker used to create the final kernel ELF file
-LD := ld
-
-# Emulator used to run the operating system
-QEMU := qemu-system-i386
-
-# Tool used to create a bootable GRUB ISO image
-GRUB_MKRESCUE := grub-mkrescue
+CC = gcc
+LD = ld
+QEMU = qemu-system-i386
+GRUB_MKRESCUE = grub-mkrescue
 
 
 # ------------------------------------------------------------
-# Compiler and linker flags
+# Project paths
 # ------------------------------------------------------------
 
-# Compiler flags:
-# -m32                 build 32-bit x86 code
-# -Wall -Wextra        enable useful warnings
-# -O2                  optimize the code
-# -g                   include debug information
-# -ffreestanding       compile without assuming a hosted C environment
-# -nostdlib            do not use the standard C library
-# -nostartfiles        do not use normal C startup files
-# -fno-pie             do not generate position-independent executable code
-# -fno-stack-protector disable stack protector runtime dependencies
-CFLAGS := -m32 \
-          -Wall -Wextra \
-          -O2 -g \
-          -ffreestanding \
-          -nostdlib \
-          -nostartfiles \
-          -fno-pie \
-          -fno-stack-protector
+KERNEL_DIR = kernel
 
-# Linker flags:
-# -m elf_i386          create a 32-bit x86 ELF file
-# -T linker.ld         use our custom linker script
-LDFLAGS := -m elf_i386 \
-           -T linker.ld
+BOOT_DIR = $(KERNEL_DIR)/boot
+SRC_DIR = $(KERNEL_DIR)/src
+INCLUDE_DIR = $(KERNEL_DIR)/include
 
-
-# ------------------------------------------------------------
-# Directories
-# ------------------------------------------------------------
-
-# Source directory
-SRC_DIR := src
-
-# Directory for generated build files
-BUILD_DIR := build
-
-# Temporary ISO filesystem root
-ISO_DIR := $(BUILD_DIR)/iso
-
-# Directory where GRUB expects the kernel inside the ISO
-BOOT_DIR := $(ISO_DIR)/boot
-
-# Directory where GRUB expects its configuration file
-GRUB_DIR := $(BOOT_DIR)/grub
+BUILD_DIR = build
+ISO_ROOT = $(BUILD_DIR)/iso
+ISO_BOOT_DIR = $(ISO_ROOT)/boot
+ISO_GRUB_DIR = $(ISO_BOOT_DIR)/grub
 
 
 # ------------------------------------------------------------
 # Output files
 # ------------------------------------------------------------
 
-# Final kernel binary loaded by GRUB
-KERNEL := $(BUILD_DIR)/kernel.elf
-
-# Final bootable ISO image
-ISO := $(BUILD_DIR)/janOS.iso
+KERNEL_ELF = $(BUILD_DIR)/kernel.elf
+ISO_IMAGE = $(BUILD_DIR)/janOS.iso
 
 
 # ------------------------------------------------------------
-# Object files
+# Flags
 # ------------------------------------------------------------
 
-# Object files that will be linked into the kernel
-OBJS := \
+CFLAGS = -m32 \
+         -Wall -Wextra \
+         -O2 -g \
+         -ffreestanding \
+         -nostdlib \
+         -nostartfiles \
+         -fno-pie \
+         -fno-stack-protector \
+         -I$(INCLUDE_DIR)
+
+LDFLAGS = -m elf_i386 \
+          -T $(BOOT_DIR)/linker.ld
+
+
+# ------------------------------------------------------------
+# Source files and object files
+# ------------------------------------------------------------
+
+# Find all C source files inside kernel/src
+C_SRCS = $(wildcard $(SRC_DIR)/*.c)
+
+# Convert:
+# kernel/src/kernel.c -> build/kernel.o
+# kernel/src/vga.c    -> build/vga.o
+C_OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(C_SRCS))
+
+# Final object list
+OBJS = \
 	$(BUILD_DIR)/boot.o \
-	$(BUILD_DIR)/kernel.o
+	$(C_OBJS)
 
 
 # ------------------------------------------------------------
 # Main targets
 # ------------------------------------------------------------
 
-# Default target.
-all: $(KERNEL)
+# Build only the kernel ELF
+all: $(KERNEL_ELF)
 
-# Build the bootable ISO image.
-iso: $(ISO)
+# Build a bootable ISO image
+iso: $(ISO_IMAGE)
 
-# Run the ISO in QEMU.
-run: $(ISO)
-	$(QEMU) -boot d -cdrom $(ISO) -m 128M
+# Run the ISO in QEMU
+run: $(ISO_IMAGE)
+	$(QEMU) -boot d -cdrom $(ISO_IMAGE) -m 128M
 
-# Remove all generated files.
+# Remove generated files
 clean:
 	rm -rf $(BUILD_DIR)
 
-# Show available make commands.
+# Show available commands
 help:
 	@echo "janOS build commands:"
 	@echo "  make        Build the kernel ELF"
 	@echo "  make iso    Build a bootable GRUB ISO"
 	@echo "  make run    Run the ISO in QEMU"
-	@echo "  make clean  Remove build files"
+	@echo "  make clean  Remove generated files"
 
 
 # ------------------------------------------------------------
-# Build rules
+# Build directories
 # ------------------------------------------------------------
 
-# Create the build directory.
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-# Build boot.o from boot.S.
-$(BUILD_DIR)/boot.o: $(SRC_DIR)/boot.S | $(BUILD_DIR)
+
+# ------------------------------------------------------------
+# Compilation rules
+# ------------------------------------------------------------
+
+# Compile boot assembly
+$(BUILD_DIR)/boot.o: $(BOOT_DIR)/boot.S | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Build kernel.o from kernel.c.
-$(BUILD_DIR)/kernel.o: $(SRC_DIR)/kernel.c | $(BUILD_DIR)
+# Compile any C file from kernel/src into build/*.o
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Link all object files into the final kernel ELF.
-$(KERNEL): $(OBJS) linker.ld
+
+# ------------------------------------------------------------
+# Link kernel
+# ------------------------------------------------------------
+
+$(KERNEL_ELF): $(OBJS) $(BOOT_DIR)/linker.ld
 	$(LD) $(LDFLAGS) $(OBJS) -o $@
 
 
 # ------------------------------------------------------------
-# ISO creation
+# Create bootable ISO
 # ------------------------------------------------------------
 
-# Create a GRUB bootable ISO image.
-$(ISO): $(KERNEL) grub.cfg
-	mkdir -p $(GRUB_DIR)
-	cp $(KERNEL) $(BOOT_DIR)/kernel.elf
-	cp grub.cfg $(GRUB_DIR)/grub.cfg
-	$(GRUB_MKRESCUE) -o $@ $(ISO_DIR)
+$(ISO_IMAGE): $(KERNEL_ELF) $(BOOT_DIR)/grub.cfg
+	mkdir -p $(ISO_GRUB_DIR)
+	cp $(KERNEL_ELF) $(ISO_BOOT_DIR)/kernel.elf
+	cp $(BOOT_DIR)/grub.cfg $(ISO_GRUB_DIR)/grub.cfg
+	$(GRUB_MKRESCUE) -o $@ $(ISO_ROOT)
 
 
 # ------------------------------------------------------------
