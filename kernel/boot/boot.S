@@ -5,14 +5,14 @@
 
 # Multiboot header.
 # GRUB looks for this header to recognize the file as a bootable kernel.
-.section .multiboot
+.section .multiboot,"a" # allocable
 .align 4
 .long MAGIC
 .long FLAGS
 .long CHECKSUM
 
 # Kernel executable code starts here
-.section .text
+.section .text.boot,"ax" # allocable and executable
 .global _start
 .extern kernel_main
 

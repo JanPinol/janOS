@@ -1,10 +1,21 @@
-#ifndef _STDIO_H_
-#define _STDIO_H_
+#ifndef STDIO_H
+#define STDIO_H
 
-#include <stddef.h>
+/*
+ * Writes a single character to the kernel output.
+ */
+int kputchar(int c);
 
-// int kputchar(int c);
-// int kputs(const char* str);
-// int kprintf(const char* format, ...);
+/*
+ * Writes a string to the kernel output.
+ */
+int kputs(const char* str);
+
+/*
+ * Writes formatted text to the kernel output.
+ *
+ * Supported formats: %c, %s, %d, %u, %x, %%
+ */
+int kprintf(const char* format, ...);
 
 #endif

@@ -24,6 +24,10 @@ BOOT_DIR = $(KERNEL_DIR)/boot
 SRC_DIR = $(KERNEL_DIR)/src
 INCLUDE_DIR = $(KERNEL_DIR)/include
 
+LIBC_DIR = libc
+LIBC_SRC_DIR = $(LIBC_DIR)/src
+LIBC_INCLUDE_DIR = $(LIBC_DIR)/include
+
 BUILD_DIR = build
 ISO_ROOT = $(BUILD_DIR)/iso
 ISO_BOOT_DIR = $(ISO_ROOT)/boot
@@ -50,9 +54,11 @@ CFLAGS = -m32 \
          -nostartfiles \
          -fno-pie \
          -fno-stack-protector \
-         -I$(INCLUDE_DIR)
+         -I$(INCLUDE_DIR) \
+		 -I$(LIBC_INCLUDE_DIR)
 
 LDFLAGS = -m elf_i386 \
+		  -n \
           -T $(BOOT_DIR)/linker.ld
 
 
@@ -60,18 +66,17 @@ LDFLAGS = -m elf_i386 \
 # Source files and object files
 # ------------------------------------------------------------
 
-# Find all C source files inside kernel/src
-C_SRCS = $(wildcard $(SRC_DIR)/*.c)
+KERNEL_C_SRCS = $(wildcard $(SRC_DIR)/*.c)
+LIBC_C_SRCS = $(wildcard $(LIBC_SRC_DIR)/*.c)
 
-# Convert:
-# kernel/src/kernel.c -> build/kernel.o
-# kernel/src/vga.c    -> build/vga.o
-C_OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(C_SRCS))
+KERNEL_C_OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/kernel_%.o,$(KERNEL_C_SRCS))
+LIBC_C_OBJS = $(patsubst $(LIBC_SRC_DIR)/%.c,$(BUILD_DIR)/libc_%.o,$(LIBC_C_SRCS))
 
 # Final object list
 OBJS = \
 	$(BUILD_DIR)/boot.o \
-	$(C_OBJS)
+	$(KERNEL_C_OBJS) \
+	$(LIBC_C_OBJS)
 
 
 # ------------------------------------------------------------
@@ -117,8 +122,12 @@ $(BUILD_DIR):
 $(BUILD_DIR)/boot.o: $(BOOT_DIR)/boot.S | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Compile any C file from kernel/src into build/*.o
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
+# Compile any C file from kernel/src into build/kernel_*.o
+$(BUILD_DIR)/kernel_%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Compile any C file from libc/src into build/libc_*.o
+$(BUILD_DIR)/libc_%.o: $(LIBC_SRC_DIR)/%.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 

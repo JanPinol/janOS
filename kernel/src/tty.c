@@ -1,5 +1,7 @@
 #include "tty.h"
 
+#include <stdint.h>
+
 /*
  * Simple VGA-backed terminal state.
  *

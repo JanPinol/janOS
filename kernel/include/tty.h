@@ -1,8 +1,7 @@
-#ifndef _TTY_H_
-#define _TTY_H_
+#ifndef TTY_H
+#define TTY_H
 
 #include <stddef.h>
-#include <stdint.h>
 
 #include "vga.h"
 

@@ -4,9 +4,34 @@ SECTIONS
 {
     . = 1M;
 
-    .multiboot  : { *(.multiboot) }         /* Header to make GRUB recognize the kernel */
-    .text       : { *(.text*) }             /* Here will be the code */
-    .rodata     : { *(.rodata*) }           /* Constant variables */
-    .data       : { *(.data*) }             /* Initialized variables */
-    .bss        : { *(.bss*) *(COMMON) }    /* Uninitialized variables */
+    .multiboot :
+    {
+        KEEP(*(.multiboot))
+    }
+
+    .text ALIGN(4K) :
+    {
+        *(.text.boot)
+        *(.text)
+        *(.text.*)
+    }
+
+    .rodata ALIGN(4K) :
+    {
+        *(.rodata)
+        *(.rodata.*)
+    }
+
+    .data ALIGN(4K) :
+    {
+        *(.data)
+        *(.data.*)
+    }
+
+    .bss ALIGN(4K) :
+    {
+        *(COMMON)
+        *(.bss)
+        *(.bss.*)
+    }
 }
