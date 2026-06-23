@@ -74,6 +74,8 @@ void tty_initialize(void)
     for (size_t row = 0; row < VGA_HEIGHT; row++) {
         tty_clear_row(row);
     }
+
+    tty_writestring("TTY initialized\n");
 }
 
 void tty_set_color(enum vga_color foreground, enum vga_color background)

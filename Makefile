@@ -72,9 +72,12 @@ LIBC_C_SRCS = $(wildcard $(LIBC_SRC_DIR)/*.c)
 KERNEL_C_OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/kernel_%.o,$(KERNEL_C_SRCS))
 LIBC_C_OBJS = $(patsubst $(LIBC_SRC_DIR)/%.c,$(BUILD_DIR)/libc_%.o,$(LIBC_C_SRCS))
 
+BOOT_ASM_SRCS = $(wildcard $(BOOT_DIR)/*.S)
+BOOT_ASM_OBJS = $(patsubst $(BOOT_DIR)/%.S,$(BUILD_DIR)/boot_%.o,$(BOOT_ASM_SRCS))
+
 # Final object list
 OBJS = \
-	$(BUILD_DIR)/boot.o \
+	$(BOOT_ASM_OBJS) \
 	$(KERNEL_C_OBJS) \
 	$(LIBC_C_OBJS)
 
@@ -119,7 +122,7 @@ $(BUILD_DIR):
 # ------------------------------------------------------------
 
 # Compile boot assembly
-$(BUILD_DIR)/boot.o: $(BOOT_DIR)/boot.S | $(BUILD_DIR)
+$(BUILD_DIR)/boot_%.o: $(BOOT_DIR)/%.S | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Compile any C file from kernel/src into build/kernel_*.o
