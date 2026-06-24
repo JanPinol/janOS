@@ -7,15 +7,15 @@
 int kputchar(int c);
 
 /*
- * Writes a string to the kernel output.
+ * Writes a string followed by a newline to the kernel output.
  */
-int kputs(const char* str);
+int kputs(const char *str);
 
 /*
  * Writes formatted text to the kernel output.
  *
- * Supported formats: %c, %s, %d, %u, %x, %%
+ * Supported formats: %c, %s, %d, %u, %x, %%.
  */
-int kprintf(const char* format, ...);
+int kprintf(const char *format, ...);
 
 #endif

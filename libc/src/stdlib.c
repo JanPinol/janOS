@@ -11,7 +11,7 @@ int abs(int n)
     return n;
 }
 
-int atoi(const char* str)
+int atoi(const char *str)
 {
     int result = 0;
     int sign = 1;
@@ -37,7 +37,7 @@ int atoi(const char* str)
     return result * sign;
 }
 
-char* utoa(unsigned int value, char* buffer, int base)
+char *utoa(unsigned int value, char *buffer, int base)
 {
     const char digits[] = "0123456789abcdef";
     char temp[32];
@@ -72,7 +72,7 @@ char* utoa(unsigned int value, char* buffer, int base)
     return buffer;
 }
 
-char* itoa(int value, char* buffer, int base)
+char *itoa(int value, char *buffer, int base)
 {
     if (base < 2 || base > 16) {
         buffer[0] = '\0';
@@ -86,5 +86,6 @@ char* itoa(int value, char* buffer, int base)
     }
 
     utoa((unsigned int)value, buffer, base);
+
     return buffer;
 }

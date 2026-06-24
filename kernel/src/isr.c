@@ -4,6 +4,8 @@
 
 #include <stdint.h>
 
+#define ISR_EXCEPTIONS 32
+
 extern void isr0(void);
 extern void isr1(void);
 extern void isr2(void);
@@ -37,7 +39,7 @@ extern void isr29(void);
 extern void isr30(void);
 extern void isr31(void);
 
-static void (*isr_stubs[32])(void) = {
+static void (*isr_stubs[ISR_EXCEPTIONS])(void) = {
     isr0,
     isr1,
     isr2,
@@ -72,7 +74,7 @@ static void (*isr_stubs[32])(void) = {
     isr31
 };
 
-static const char* exception_messages[32] = {
+static const char *exception_messages[ISR_EXCEPTIONS] = {
     "Divide by zero",
     "Debug",
     "Non-maskable interrupt",
@@ -109,19 +111,19 @@ static const char* exception_messages[32] = {
 
 void isr_initialize(void)
 {
-    for (uint8_t i = 0; i < 32; i++) {
+    for (uint8_t i = 0; i < ISR_EXCEPTIONS; i++) {
         idt_set_entry(i, (uint32_t)isr_stubs[i],
-                      KERNEL_CODE_SELECTOR, IDT_INTERRUPT_GATE);
+                      IDT_KERNEL_CODE_SELECTOR, IDT_INTERRUPT_GATE);
     }
 
     kputs("ISR initialized");
 }
 
-void isr_handler(struct interrupt_frame* frame)
+void isr_handler(struct interrupt_frame *frame)
 {
     kprintf("\nCPU exception: %u\n", frame->interrupt_number);
 
-    if (frame->interrupt_number < 32) {
+    if (frame->interrupt_number < ISR_EXCEPTIONS) {
         kprintf("Message: %s\n", exception_messages[frame->interrupt_number]);
     }
 

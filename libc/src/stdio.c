@@ -8,19 +8,20 @@
 
 int kputchar(int c)
 {
-    tty_putchar((char) c);
+    tty_putchar((char)c);
+
     return c;
 }
 
-int kputs(const char* str)
+int kputs(const char *str)
 {
     tty_writestring(str);
     tty_putchar('\n');
 
-    return (int) strlen(str) + 1;
+    return (int)strlen(str) + 1;
 }
 
-int kprintf(const char* format, ...)
+int kprintf(const char *format, ...)
 {
     va_list args;
     int written = 0;
@@ -44,64 +45,67 @@ int kprintf(const char* format, ...)
         }
 
         switch (format[i]) {
-            case 'c': {
-                char c = (char) va_arg(args, int);
-                kputchar(c);
-                written++;
-                break;
+        case 'c': {
+            char c = (char)va_arg(args, int);
+
+            kputchar(c);
+            written++;
+            break;
+        }
+
+        case 's': {
+            const char *str = va_arg(args, const char *);
+
+            if (str == NULL) {
+                str = "(null)";
             }
 
-            case 's': {
-                const char* str = va_arg(args, const char*);
+            tty_writestring(str);
+            written += strlen(str);
+            break;
+        }
 
-                if (str == NULL) {
-                    str = "(null)";
-                }
+        case 'd': {
+            int value = va_arg(args, int);
 
-                tty_writestring(str);
-                written += strlen(str);
-                break;
-            }
+            itoa(value, buffer, 10);
+            tty_writestring(buffer);
+            written += strlen(buffer);
+            break;
+        }
 
-            case 'd': {
-                int value = va_arg(args, int);
-                itoa(value, buffer, 10);
-                tty_writestring(buffer);
-                written += strlen(buffer);
-                break;
-            }
+        case 'u': {
+            unsigned int value = va_arg(args, unsigned int);
 
-            case 'u': {
-                unsigned int value = va_arg(args, unsigned int);
-                utoa(value, buffer, 10);
-                tty_writestring(buffer);
-                written += strlen(buffer);
-                break;
-            }
+            utoa(value, buffer, 10);
+            tty_writestring(buffer);
+            written += strlen(buffer);
+            break;
+        }
 
-            case 'x': {
-                unsigned int value = va_arg(args, unsigned int);
-                utoa(value, buffer, 16);
-                tty_writestring(buffer);
-                written += strlen(buffer);
-                break;
-            }
+        case 'x': {
+            unsigned int value = va_arg(args, unsigned int);
 
-            case '%': {
-                kputchar('%');
-                written++;
-                break;
-            }
+            utoa(value, buffer, 16);
+            tty_writestring(buffer);
+            written += strlen(buffer);
+            break;
+        }
 
-            default: {
-                kputchar('%');
-                kputchar(format[i]);
-                written += 2;
-                break;
-            }
+        case '%':
+            kputchar('%');
+            written++;
+            break;
+
+        default:
+            kputchar('%');
+            kputchar(format[i]);
+            written += 2;
+            break;
         }
     }
 
     va_end(args);
+
     return written;
 }

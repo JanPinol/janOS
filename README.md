@@ -25,8 +25,6 @@ make run
 make clean
 
 ## Roadmap
-- GDT
-- IDT
 - PIC/PIT
 - Keyboard input
 - Memory management

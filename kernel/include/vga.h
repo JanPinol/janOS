@@ -13,7 +13,7 @@
  *   bits 0..7   = ASCII character
  *   bits 8..15  = color attribute
  */
-#define VGA_WIDTH 80
+#define VGA_WIDTH  80
 #define VGA_HEIGHT 25
 #define VGA_MEMORY 0xB8000
 
@@ -40,22 +40,22 @@ enum vga_color {
 };
 
 /*
- * Build a VGA color attribute from foreground and background colors.
+ * Builds a VGA color attribute from foreground and background colors.
  */
 uint8_t vga_color(enum vga_color foreground, enum vga_color background);
 
 /*
- * Build a 16-bit VGA text entry from a character and color attribute.
+ * Builds a 16-bit VGA text entry from a character and color attribute.
  */
 uint16_t vga_entry(uint8_t character, uint8_t color);
 
 /*
- * Write a VGA entry at the given text-mode position.
+ * Writes a VGA entry at the given text-mode position.
  */
 void vga_putentry_at(uint16_t entry, size_t row, size_t col);
 
 /*
- * Get a VGA entry at the given text-mode position.
+ * Gets a VGA entry at the given text-mode position.
  */
 uint16_t vga_getentry_at(size_t row, size_t col);
 

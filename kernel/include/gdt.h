@@ -2,7 +2,7 @@
 #define GDT_H
 
 /*
- * Initialize the Global Descriptor Table.
+ * Initializes the kernel Global Descriptor Table.
  */
 void gdt_initialize(void);
 

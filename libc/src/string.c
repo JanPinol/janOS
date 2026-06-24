@@ -1,8 +1,9 @@
 #include "string.h"
 
-size_t strlen(const char* str)
+size_t strlen(const char *str)
 {
     size_t i = 0;
+
     while (str[i] != '\0') {
         i++;
     }
@@ -10,21 +11,21 @@ size_t strlen(const char* str)
     return i;
 }
 
-void* memset(void* dest, int value, size_t count)
+void *memset(void *dest, int value, size_t count)
 {
-    unsigned char* ptr = dest;
+    unsigned char *ptr = dest;
 
     for (size_t i = 0; i < count; i++) {
-        ptr[i] = (unsigned char) value;
+        ptr[i] = (unsigned char)value;
     }
 
     return dest;
 }
 
-void* memcpy(void* dest, const void* src, size_t count)
+void *memcpy(void *dest, const void *src, size_t count)
 {
-    unsigned char* d_ptr = dest;
-    const unsigned char* s_ptr = src;
+    unsigned char *d_ptr = dest;
+    const unsigned char *s_ptr = src;
 
     for (size_t i = 0; i < count; i++) {
         d_ptr[i] = s_ptr[i];
@@ -33,10 +34,10 @@ void* memcpy(void* dest, const void* src, size_t count)
     return dest;
 }
 
-void* memmove(void* dest, const void* src, size_t count)
+void *memmove(void *dest, const void *src, size_t count)
 {
-    unsigned char* d_ptr = dest;
-    const unsigned char* s_ptr = src;
+    unsigned char *d_ptr = dest;
+    const unsigned char *s_ptr = src;
 
     if (d_ptr == s_ptr || count == 0) {
         return dest;
@@ -55,10 +56,10 @@ void* memmove(void* dest, const void* src, size_t count)
     return dest;
 }
 
-int memcmp(const void* a, const void* b, size_t count)
+int memcmp(const void *a, const void *b, size_t count)
 {
-    const unsigned char* a_ptr = a;
-    const unsigned char* b_ptr = b;
+    const unsigned char *a_ptr = a;
+    const unsigned char *b_ptr = b;
 
     for (size_t i = 0; i < count; i++) {
         if (a_ptr[i] > b_ptr[i]) {
@@ -73,13 +74,13 @@ int memcmp(const void* a, const void* b, size_t count)
     return 0;
 }
 
-int strcmp(const char* a, const char* b)
+int strcmp(const char *a, const char *b)
 {
     size_t i = 0;
 
     while (a[i] != '\0' && b[i] != '\0') {
-        unsigned char ca = (unsigned char) a[i];
-        unsigned char cb = (unsigned char) b[i];
+        unsigned char ca = (unsigned char)a[i];
+        unsigned char cb = (unsigned char)b[i];
 
         if (ca > cb) {
             return 1;
@@ -96,18 +97,18 @@ int strcmp(const char* a, const char* b)
         return 0;
     }
 
-    if ((unsigned char) a[i] > (unsigned char) b[i]) {
+    if ((unsigned char)a[i] > (unsigned char)b[i]) {
         return 1;
     }
 
     return -1;
 }
 
-int strncmp(const char* a, const char* b, size_t count)
+int strncmp(const char *a, const char *b, size_t count)
 {
     for (size_t i = 0; i < count; i++) {
-        unsigned char ca = (unsigned char) a[i];
-        unsigned char cb = (unsigned char) b[i];
+        unsigned char ca = (unsigned char)a[i];
+        unsigned char cb = (unsigned char)b[i];
 
         if (ca != cb) {
             return ca - cb;
@@ -121,7 +122,7 @@ int strncmp(const char* a, const char* b, size_t count)
     return 0;
 }
 
-char* strcpy(char* dest, const char* src)
+char *strcpy(char *dest, const char *src)
 {
     size_t i = 0;
 
@@ -135,7 +136,7 @@ char* strcpy(char* dest, const char* src)
     return dest;
 }
 
-char* strncpy(char* dest, const char* src, size_t count)
+char *strncpy(char *dest, const char *src, size_t count)
 {
     size_t i = 0;
 

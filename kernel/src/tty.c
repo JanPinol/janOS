@@ -12,7 +12,7 @@ static size_t tty_col;
 static uint8_t tty_color;
 
 /*
- * Write one character at an explicit position using an explicit color.
+ * Writes one character at an explicit position using an explicit color.
  */
 static void tty_putentry_at(char character, uint8_t color, size_t row, size_t col)
 {
@@ -22,7 +22,7 @@ static void tty_putentry_at(char character, uint8_t color, size_t row, size_t co
 }
 
 /*
- * Clear one row using the current terminal color.
+ * Clears one row using the current terminal color.
  */
 static void tty_clear_row(size_t row)
 {
@@ -34,7 +34,7 @@ static void tty_clear_row(size_t row)
 }
 
 /*
- * Scroll the terminal one row up.
+ * Scrolls the terminal one row up.
  */
 static void tty_scroll(void)
 {
@@ -53,7 +53,7 @@ static void tty_scroll(void)
 }
 
 /*
- * Move the cursor to the next line.
+ * Moves the cursor to the next line.
  */
 static void tty_newline(void)
 {
@@ -99,14 +99,14 @@ void tty_putchar(char character)
     }
 }
 
-void tty_write(const char* data, size_t size)
+void tty_write(const char *data, size_t size)
 {
     for (size_t i = 0; i < size; i++) {
         tty_putchar(data[i]);
     }
 }
 
-void tty_writestring(const char* data)
+void tty_writestring(const char *data)
 {
     size_t i = 0;
 

@@ -14,8 +14,8 @@ struct interrupt_frame {
 void isr_initialize(void);
 
 /*
- * Common C handler for CPU exceptions.
+ * Handles CPU exceptions from ISR stubs.
  */
-void isr_handler(struct interrupt_frame* frame);
+void isr_handler(struct interrupt_frame *frame);
 
 #endif

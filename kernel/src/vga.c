@@ -1,6 +1,6 @@
 #include "vga.h"
 
-static volatile uint16_t* const vga_buffer = (volatile uint16_t*)VGA_MEMORY;
+static volatile uint16_t *const vga_buffer = (volatile uint16_t *)VGA_MEMORY;
 
 uint8_t vga_color(enum vga_color foreground, enum vga_color background)
 {

@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-#define KERNEL_CODE_SELECTOR 0x08
-#define IDT_INTERRUPT_GATE 0x8E
+#define IDT_KERNEL_CODE_SELECTOR 0x08
+#define IDT_INTERRUPT_GATE       0x8E
 
 /*
  * Initializes the Interrupt Descriptor Table.
