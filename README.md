@@ -16,16 +16,16 @@ Tiny educational x86 32-bit operating system.
 
 ## Project layout
 ```
-arch/x86/      x86-specific code
-  boot/        Multiboot entry, GDT/IDT loaders, ISR/IRQ stubs, linker, GRUB cfg
-  include/arch/  CPU headers   -> #include <arch/idt.h>
-  *.c          GDT, IDT, ISR, IRQ, PIC, port I/O
-drivers/       hardware drivers (keyboard, PIT timer, VGA, TTY)
-  include/drivers/             -> #include <drivers/keyboard.h>
-kernel/        architecture-independent core (entry, shell)
-  include/kernel/              -> #include <kernel/shell.h>
-lib/           freestanding libc (standard names: #include <stdio.h>)
-build/         generated objects, ELF and ISO (git-ignored)
+arch/x86/              x86-specific code
+  boot/                Multiboot entry, GDT/IDT loaders, ISR/IRQ stubs, linker, GRUB cfg
+  include/arch/        CPU headers   -> #include <arch/idt.h>
+  *.c                  GDT, IDT, ISR, IRQ, PIC, port I/O
+drivers/               hardware drivers (keyboard, PIT timer, VGA, TTY)
+  include/drivers/         -> #include <drivers/keyboard.h>
+kernel/                architecture-independent core (entry, shell)
+  include/kernel/          -> #include <kernel/shell.h>
+lib/                   freestanding libc (standard names: #include <stdio.h>)
+build/                 generated objects, ELF and ISO (git-ignored)
 ```
 
 ## Coding style
