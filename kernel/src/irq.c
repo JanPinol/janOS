@@ -52,8 +52,6 @@ void irq_initialize(void)
         idt_set_entry(IRQ_OFFSET + i, (uint32_t) irq_stubs[i],
                       IDT_KERNEL_CODE_SELECTOR, IDT_INTERRUPT_GATE);
     }
-
-    kputs("IRQ initialized");
 }
 
 void irq_handler(struct interrupt_frame *frame)
@@ -62,10 +60,6 @@ void irq_handler(struct interrupt_frame *frame)
 
     if (irq == 0) {
         pit_tick();
-
-        // if ((pit_get_ticks() % 100) == 0) {
-        //     kprintf("Seconds: %u\n", pit_get_ticks() / 100);
-        // }
     } else if (irq == 1) {
         keyboard_handle_irq();
     } else {
@@ -73,4 +67,14 @@ void irq_handler(struct interrupt_frame *frame)
     }
 
     pic_send_eoi(irq);
+}
+
+void irq_enable()
+{
+    __asm__ volatile ("sti");
+}
+
+void irq_disable()
+{
+    __asm__ volatile ("cli");
 }

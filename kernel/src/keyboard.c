@@ -1,8 +1,6 @@
 #include "keyboard.h"
 #include "io.h"
-#include "tty.h"
 
-#include <stdbool.h>
 #include <stddef.h>
 
 #define KEYBOARD_DATA_PORT     0x60
@@ -18,11 +16,16 @@
 
 #define ASCII_ESCAPE           0x1B
 
+#define KEYBOARD_BUFFER_SIZE    128
+
 static bool shift_pressed;
 static bool caps_lock_enabled;
 static bool alt_pressed;
 static bool altgr_pressed;
 static bool extended_scancode;
+static char keyboard_buffer[KEYBOARD_BUFFER_SIZE];
+static uint32_t keyboard_buffer_read;
+static uint32_t keyboard_buffer_write;
 
 /*
  * Spanish keyboard layout, scancode set 1.
@@ -230,6 +233,45 @@ static char keyboard_translate(uint8_t scancode)
     return character;
 }
 
+static uint32_t keyboard_buffer_next(uint32_t index)
+{
+    return (index + 1) % KEYBOARD_BUFFER_SIZE;
+}
+
+static bool keyboard_buffer_is_full(void)
+{
+    return keyboard_buffer_next(keyboard_buffer_write) == keyboard_buffer_read;
+}
+
+bool keyboard_has_char(void)
+{
+    return keyboard_buffer_read != keyboard_buffer_write;
+}
+
+static void keyboard_put_char(char character)
+{
+    if (keyboard_buffer_is_full()) {
+        return;
+    }
+
+    keyboard_buffer[keyboard_buffer_write] = character;
+    keyboard_buffer_write = keyboard_buffer_next(keyboard_buffer_write);
+}
+
+char keyboard_get_char(void)
+{
+    char character;
+
+    if (!keyboard_has_char()) {
+        return 0;
+    }
+
+    character = keyboard_buffer[keyboard_buffer_read];
+    keyboard_buffer_read = keyboard_buffer_next(keyboard_buffer_read);
+
+    return character;
+}
+
 void keyboard_initialize(void)
 {
     shift_pressed = false;
@@ -237,6 +279,9 @@ void keyboard_initialize(void)
     alt_pressed = false;
     altgr_pressed = false;
     extended_scancode = false;
+
+    keyboard_buffer_read = 0;
+    keyboard_buffer_write = 0;
 }
 
 void keyboard_handle_irq(void)
@@ -290,5 +335,5 @@ void keyboard_handle_irq(void)
         return;
     }
 
-    tty_putchar(character);
+    keyboard_put_char(character);
 }

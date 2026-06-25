@@ -115,8 +115,6 @@ void isr_initialize(void)
         idt_set_entry(i, (uint32_t)isr_stubs[i],
                       IDT_KERNEL_CODE_SELECTOR, IDT_INTERRUPT_GATE);
     }
-
-    kputs("ISR initialized");
 }
 
 void isr_handler(struct interrupt_frame *frame)

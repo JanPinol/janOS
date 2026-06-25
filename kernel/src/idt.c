@@ -40,6 +40,4 @@ void idt_initialize(void)
     memset(idt, 0, sizeof(idt));
 
     idt_load((uint32_t)&idt_descriptor);
-
-    kputs("IDT initialized");
 }

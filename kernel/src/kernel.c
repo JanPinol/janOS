@@ -5,15 +5,13 @@
 #include "keyboard.h"
 #include "pic.h"
 #include "pit.h"
+#include "shell.h"
 #include "stdio.h"
 #include "tty.h"
 
 void kernel_main(void)
 {
     tty_initialize();
-
-    kputs("janOS kernel initialized");
-
     gdt_initialize();
     idt_initialize();
     isr_initialize();
@@ -22,12 +20,15 @@ void kernel_main(void)
     irq_initialize();
     pit_initialize(100);
     keyboard_initialize();
+    shell_initialize();
 
-    kputs("Kernel setup complete");
-
-    __asm__ volatile ("sti");
+    irq_enable();
 
     for (;;) {
+        while (keyboard_has_char()) {
+            shell_handle_char(keyboard_get_char());
+        }
+
         __asm__ volatile ("hlt");
     }
 }

@@ -13,4 +13,14 @@ void irq_initialize(void);
  */
 void irq_handler(struct interrupt_frame *frame);
 
+/*
+ * Enables hardware interrupts.
+ */
+void irq_enable(void);
+
+/*
+ * Disables hardware interrupts.
+ */
+void irq_disable(void);
+
 #endif

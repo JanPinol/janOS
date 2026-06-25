@@ -58,6 +58,4 @@ void gdt_initialize(void)
     gdt_set_entry(2, 0, 0xFFFFF, 0x92, 0xC0);
 
     gdt_flush((uint32_t)&gdt_descriptor);
-
-    kputs("GDT initialized");
 }

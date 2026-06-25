@@ -74,8 +74,6 @@ void tty_initialize(void)
     for (size_t row = 0; row < VGA_HEIGHT; row++) {
         tty_clear_row(row);
     }
-
-    tty_writestring("TTY initialized\n");
 }
 
 void tty_set_color(enum vga_color foreground, enum vga_color background)
@@ -85,16 +83,16 @@ void tty_set_color(enum vga_color foreground, enum vga_color background)
 
 void tty_putchar(char character)
 {
-    if (character == '\n') {
-        tty_newline();
-        return;
-    }
-
     if (character == '\b') {
         if (tty_col > 0) {
             tty_col--;
             tty_putentry_at(' ', tty_color, tty_row, tty_col);
         }
+        return;
+    }
+
+    if (character == '\n') {
+        tty_newline();
         return;
     }
 
