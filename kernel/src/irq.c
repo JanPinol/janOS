@@ -3,6 +3,7 @@
 #include "pic.h"
 #include "stdio.h"
 #include "pit.h"
+#include "keyboard.h"
 
 #include <stdint.h>
 
@@ -62,9 +63,11 @@ void irq_handler(struct interrupt_frame *frame)
     if (irq == 0) {
         pit_tick();
 
-        if ((pit_get_ticks() % 100) == 0) {
-            kprintf("Seconds: %u\n", pit_get_ticks() / 100);
-        }
+        // if ((pit_get_ticks() % 100) == 0) {
+        //     kprintf("Seconds: %u\n", pit_get_ticks() / 100);
+        // }
+    } else if (irq == 1) {
+        keyboard_handle_irq();
     } else {
         kprintf("IRQ received: %u\n", irq);
     }

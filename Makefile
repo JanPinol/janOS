@@ -84,7 +84,7 @@ all: $(KERNEL_ELF)
 iso: $(ISO_IMAGE)
 
 run: $(ISO_IMAGE)
-	$(QEMU) -boot d -cdrom $(ISO_IMAGE) -m 128M
+	$(QEMU) -boot d -cdrom $(ISO_IMAGE) -m 128M -k es
 
 clean:
 	rm -rf $(BUILD_DIR)

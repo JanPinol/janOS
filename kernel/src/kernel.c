@@ -2,6 +2,7 @@
 #include "idt.h"
 #include "irq.h"
 #include "isr.h"
+#include "keyboard.h"
 #include "pic.h"
 #include "pit.h"
 #include "stdio.h"
@@ -11,6 +12,8 @@ void kernel_main(void)
 {
     tty_initialize();
 
+    kputs("janOS kernel initialized");
+
     gdt_initialize();
     idt_initialize();
     isr_initialize();
@@ -18,6 +21,7 @@ void kernel_main(void)
     pic_remap();
     irq_initialize();
     pit_initialize(100);
+    keyboard_initialize();
 
     kputs("Kernel setup complete");
 

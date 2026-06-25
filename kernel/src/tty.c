@@ -90,6 +90,14 @@ void tty_putchar(char character)
         return;
     }
 
+    if (character == '\b') {
+        if (tty_col > 0) {
+            tty_col--;
+            tty_putentry_at(' ', tty_color, tty_row, tty_col);
+        }
+        return;
+    }
+
     tty_putentry_at(character, tty_color, tty_row, tty_col);
 
     tty_col++;
