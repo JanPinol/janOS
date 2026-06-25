@@ -1,6 +1,9 @@
 # ============================================================
 # janOS Makefile
 # Builds a 32-bit x86 kernel and boots it with GRUB/Multiboot
+#
+# Sources are discovered recursively, so adding a new .c under
+# arch/, drivers/, kernel/ or lib/ requires no Makefile changes.
 # ============================================================
 
 # ------------------------------------------------------------
@@ -16,20 +19,19 @@ GRUB_MKRESCUE = grub-mkrescue
 # Project paths
 # ------------------------------------------------------------
 
-KERNEL_DIR = kernel
-
-BOOT_DIR = $(KERNEL_DIR)/boot
-SRC_DIR = $(KERNEL_DIR)/src
-INCLUDE_DIR = $(KERNEL_DIR)/include
-
-LIBC_DIR = libc
-LIBC_SRC_DIR = $(LIBC_DIR)/src
-LIBC_INCLUDE_DIR = $(LIBC_DIR)/include
+ARCH_DIR = arch/x86
+BOOT_DIR = $(ARCH_DIR)/boot
 
 BUILD_DIR = build
 ISO_ROOT = $(BUILD_DIR)/iso
 ISO_BOOT_DIR = $(ISO_ROOT)/boot
 ISO_GRUB_DIR = $(ISO_BOOT_DIR)/grub
+
+INCLUDE_DIRS = \
+    $(ARCH_DIR)/include \
+    drivers/include \
+    kernel/include \
+    lib/include
 
 # ------------------------------------------------------------
 # Output files
@@ -43,6 +45,7 @@ ISO_IMAGE = $(BUILD_DIR)/janOS.iso
 # ------------------------------------------------------------
 
 CFLAGS = -m32 \
+    -std=gnu11 \
     -Wall -Wextra \
     -O2 -g \
     -ffreestanding \
@@ -50,30 +53,28 @@ CFLAGS = -m32 \
     -nostartfiles \
     -fno-pie \
     -fno-stack-protector \
-    -I$(INCLUDE_DIR) \
-    -I$(LIBC_INCLUDE_DIR)
+    -MMD -MP \
+    $(addprefix -I,$(INCLUDE_DIRS))
 
 LDFLAGS = -m elf_i386 \
     -n \
     -T $(BOOT_DIR)/linker.ld
 
 # ------------------------------------------------------------
-# Source files and object files
+# Source and object discovery
+#
+# Every object mirrors its source path under $(BUILD_DIR), e.g.
+# arch/x86/gdt.c -> build/arch/x86/gdt.o
 # ------------------------------------------------------------
 
-KERNEL_C_SRCS = $(wildcard $(SRC_DIR)/*.c)
-LIBC_C_SRCS = $(wildcard $(LIBC_SRC_DIR)/*.c)
-
-KERNEL_C_OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/kernel_%.o,$(KERNEL_C_SRCS))
-LIBC_C_OBJS = $(patsubst $(LIBC_SRC_DIR)/%.c,$(BUILD_DIR)/libc_%.o,$(LIBC_C_SRCS))
-
-BOOT_ASM_SRCS = $(wildcard $(BOOT_DIR)/*.S)
-BOOT_ASM_OBJS = $(patsubst $(BOOT_DIR)/%.S,$(BUILD_DIR)/boot_%.o,$(BOOT_ASM_SRCS))
+C_SRCS = $(shell find $(ARCH_DIR) drivers kernel lib -name '*.c')
+ASM_SRCS = $(shell find $(BOOT_DIR) -name '*.S')
 
 OBJS = \
-    $(BOOT_ASM_OBJS) \
-    $(KERNEL_C_OBJS) \
-    $(LIBC_C_OBJS)
+    $(C_SRCS:%.c=$(BUILD_DIR)/%.o) \
+    $(ASM_SRCS:%.S=$(BUILD_DIR)/%.o)
+
+DEPS = $(OBJS:.o=.d)
 
 # ------------------------------------------------------------
 # Main targets
@@ -97,23 +98,15 @@ help:
 	@echo "  make clean  Remove generated files"
 
 # ------------------------------------------------------------
-# Build directories
-# ------------------------------------------------------------
-
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
-
-# ------------------------------------------------------------
 # Compilation rules
 # ------------------------------------------------------------
 
-$(BUILD_DIR)/boot_%.o: $(BOOT_DIR)/%.S | $(BUILD_DIR)
+$(BUILD_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/kernel_%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(BUILD_DIR)/libc_%.o: $(LIBC_SRC_DIR)/%.c | $(BUILD_DIR)
+$(BUILD_DIR)/%.o: %.S
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # ------------------------------------------------------------
@@ -132,6 +125,12 @@ $(ISO_IMAGE): $(KERNEL_ELF) $(BOOT_DIR)/grub.cfg
 	cp $(KERNEL_ELF) $(ISO_BOOT_DIR)/kernel.elf
 	cp $(BOOT_DIR)/grub.cfg $(ISO_GRUB_DIR)/grub.cfg
 	$(GRUB_MKRESCUE) -o $@ $(ISO_ROOT)
+
+# ------------------------------------------------------------
+# Auto-generated header dependencies
+# ------------------------------------------------------------
+
+-include $(DEPS)
 
 # ------------------------------------------------------------
 # Phony targets

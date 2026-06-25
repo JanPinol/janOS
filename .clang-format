@@ -1,0 +1,34 @@
+# janOS coding style: Linux kernel conventions with 4-space indentation.
+# Run `clang-format -i <file>` or wire it into your editor to apply.
+---
+Language: Cpp
+BasedOnStyle: LLVM
+
+# Indentation: 4 spaces, never tabs.
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ContinuationIndentWidth: 4
+IndentCaseLabels: false
+
+# Braces: Linux style. Functions open on the next line; control
+# statements keep the brace on the same line.
+BreakBeforeBraces: Linux
+
+# Keep statements expanded, the way the kernel does.
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+
+# Layout.
+ColumnLimit: 80
+PointerAlignment: Right
+SpaceBeforeParens: ControlStatements
+AlignAfterOpenBracket: Align
+AlignEscapedNewlines: Left
+SortIncludes: false
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 1
+...
